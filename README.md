@@ -1,4 +1,8 @@
-# Brokeflow
+<p align="center">
+  <img src="assets/logo.svg" width="100" height="100" alt="Brokeflow Logo" />
+</p>
+
+<h1 align="center">Brokeflow</h1>
 
 Brokeflow is an open-source, zero-subscription web application that helps student developers establish strict guardrails and behavioral constraints for AI coding agents. By answering a brief series of questions, builders receive drop-in configuration files that keep tools like Claude Code, Copilot, Gemini, and Cursor aligned with industry best practices, preventing common software engineering pitfalls.
 
@@ -76,13 +80,6 @@ Brokeflow is built with React, Vite, and Tailwind CSS.
    ```bash
    npm run build
    ```
-
-## Deployment
-
-The application is configured to auto-deploy to Vercel upon pushes to the main branch of the repository: https://github.com/JeraldPascual/Brokeflow
-
-* **Routing:** SPA routing fallback is handled via `vercel.json` using rewrites.
-* **Build output:** Target directory is `dist`.
 
 ## License
 
