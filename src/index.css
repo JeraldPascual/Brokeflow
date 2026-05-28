@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --teal:        #00A19C;
+  --teal-dark:   #007A76;
+  --teal-deeper: #005855;
+  --petronas:    #00D2BE;
+  --petronas-lt: #AFFFFB;
+  --bg:          #F4FFFE;
+  --surface:     #FFFFFF;
+  --border:      #C8EDEB;
+  --border-med:  #99DCDA;
+  --text:        #0D1F1E;
+  --text-muted:  #4A7370;
+  --text-subtle: #8AADAB;
+  --success:     #059669;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Figtree', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
+}
+
+@keyframes pulseRing {
+  0%   { box-shadow: 0 0 0 0 rgba(0, 210, 190, 0.4); }
+  70%  { box-shadow: 0 0 0 8px rgba(0, 210, 190, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 210, 190, 0); }
+}
+
+.animate-fade-up    { animation: fadeUp 0.4s ease both; }
+.animate-float      { animation: floatBadge 3s ease-in-out infinite; }
+.animate-pulse-ring { animation: pulseRing 2s infinite; }
+
+/* Phase 5: button utilities replacing inline style objects in components */
+.btn-primary {
+  background: var(--teal);
+  color: white;
+  box-shadow: 0 4px 16px rgba(0, 161, 156, 0.3);
+}
+
+.btn-muted {
+  background: var(--border);
+  color: var(--text-subtle);
+}
+
+/* Phase 5: download button states */
+.btn-dl {
+  background: var(--teal);
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 161, 156, 0.25);
+}
+
+.btn-dl-done {
+  background: var(--success);
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 161, 156, 0.25);
+}
+
+/* Phase 5: output card top accent border replacing inline style */
+.output-card-top {
+  border-top: 3px solid var(--teal);
+}
