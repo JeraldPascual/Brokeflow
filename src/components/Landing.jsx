@@ -8,11 +8,11 @@ export default function Landing() {
   return (
     <>
       {/* NAV */}
-      <nav className="sticky top-0 z-50 bg-[rgba(244,255,254,0.92)] backdrop-blur-md border-b border-[var(--border)] px-8 py-4 flex items-center justify-between">
+      <nav className="sticky top-0 z-50 bg-[rgba(244,255,254,0.92)] backdrop-blur-md border-b border-[var(--border)] px-4 sm:px-8 py-4 flex items-center justify-between">
         <div className="text-xl font-black tracking-tight text-[var(--teal-deeper)]">
           BROKE<span className="text-[var(--petronas)]">FLOW</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <a
             href="https://github.com/JeraldPascual/Brokeflow"
             target="_blank"
@@ -20,19 +20,19 @@ export default function Landing() {
             className="text-xs font-bold text-[var(--text-subtle)] hover:text-[var(--teal)] transition-all flex items-center gap-1.5"
           >
             <Icon name="github" size={16} />
-            <span>Contribute</span>
+            <span className="hidden sm:inline">Contribute</span>
           </a>
           <a
             href="#configurator"
-            className="bg-[var(--teal)] text-white text-xs font-bold px-5 py-2 rounded-full tracking-wide hover:bg-[var(--teal-dark)] transition-all hover:-translate-y-px"
+            className="bg-[var(--teal)] text-white text-[10px] sm:text-xs font-bold px-3.5 sm:px-5 py-2 rounded-full tracking-wide hover:bg-[var(--teal-dark)] transition-all hover:-translate-y-px"
           >
-            GET YOUR CONFIG →
+            GET CONFIG →
           </a>
         </div>
       </nav>
 
       {/* HERO */}
-      <section className="max-w-3xl mx-auto px-8 pt-20 pb-16 text-center animate-fade-up">
+      <section className="max-w-3xl mx-auto px-4 sm:px-8 pt-12 sm:pt-20 pb-12 sm:pb-16 text-center animate-fade-up">
         {/* Eyebrow badge */}
         <div className="inline-flex items-center gap-2 bg-white border-2 border-[var(--border-med)] rounded-full px-4 py-1.5 text-xs font-bold text-[var(--teal)] tracking-widest mb-7 animate-float shadow-sm">
           <span className="w-2 h-2 rounded-full bg-[var(--petronas)] animate-pulse-ring" />
@@ -40,7 +40,7 @@ export default function Landing() {
         </div>
 
         {/* Headline */}
-        <h1 className="text-5xl md:text-6xl font-black leading-[1.06] tracking-tight text-[var(--teal-deeper)] mb-5">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.06] tracking-tight text-[var(--teal-deeper)] mb-5">
           Stop vibe coding.<br />
           Start{' '}
           <span className="bg-gradient-to-r from-[var(--teal)] to-[var(--petronas)] bg-clip-text text-transparent">
@@ -50,14 +50,14 @@ export default function Landing() {
         </h1>
 
         {/* Sub */}
-        <p className="text-lg font-medium text-[var(--text-muted)] max-w-lg mx-auto mb-9 leading-relaxed">
+        <p className="text-sm sm:text-lg font-medium text-[var(--text-muted)] max-w-lg mx-auto mb-9 leading-relaxed">
           Brokeflow is a drop-in AI workspace config that keeps Claude,
           Copilot, and Gemini in line — no matter how tight the deadline.
         </p>
 
         <a
           href="#configurator"
-          className="inline-flex items-center gap-2 bg-[var(--teal)] text-white text-base font-bold px-8 py-4 rounded-full shadow-lg shadow-teal-DEFAULT/30 hover:bg-[var(--teal-dark)] hover:-translate-y-0.5 transition-all"
+          className="inline-flex items-center gap-2 bg-[var(--teal)] text-white text-sm sm:text-base font-bold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full shadow-lg shadow-teal-DEFAULT/30 hover:bg-[var(--teal-dark)] hover:-translate-y-0.5 transition-all"
         >
           Build my config ↓
         </a>

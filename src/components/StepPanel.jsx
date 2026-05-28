@@ -7,7 +7,7 @@ export default function StepPanel({
   const showFwInput = currentStep.id === 'stack' && state.stack
 
   return (
-    <div className="bg-white border-2 border-[var(--border)] rounded-2xl p-8 shadow-sm animate-fade-up">
+    <div className="bg-white border-2 border-[var(--border)] rounded-2xl p-5 sm:p-8 shadow-sm animate-fade-up">
       {/* Progress */}
       <div className="flex items-center gap-1.5 mb-7">
         {Array.from({ length: stepCount }).map((_, i) => (

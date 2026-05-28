@@ -143,7 +143,7 @@ export default function OutputPanel({ answers, onReset, onLogEvent }) {
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-black tracking-widest text-[var(--petronas)]">QUICK COPY</span>
             <span className="text-xs font-bold text-white">AGENTS.md</span>
-            <span className="text-white/40 text-[10px]">— most important file</span>
+            <span className="text-white/40 text-[10px] hidden sm:inline">— most important file</span>
           </div>
           <div className="flex items-center gap-2">
             <button
