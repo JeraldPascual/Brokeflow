@@ -48,6 +48,28 @@ export function buildToolsGuide(tools) {
 - Inline edits: Use Cmd+K for fast modifications. Review the interactive side-by-side diff window carefully before accepting.
 `
   }
+  if (tools.includes('aider')) {
+    text += `
+### Aider (CLI Assistant)
+- .aider.instruction.md standard: Keep this file in the root. Aider automatically loads it to guide code generations.
+- Selective Context: Use '/add <file>' to pull only files you are actively modifying. Do not overload Aider's context.
+- Commit Discipline: Let Aider generate clear commits using '/commit' after successful edits. Verify changes before staging.
+`
+  }
+  if (tools.includes('windsurf')) {
+    text += `
+### Windsurf (IDE)
+- .windsurfrules integration: Windsurf reads custom instructions from this root file to govern its agentic flows.
+- Cascade Mode Rules: When Windsurf's agent runs in Cascade mode, inspect its suggested file edits at each step. Terminate Cascade early if the agent deviates from the requested file scope.
+`
+  }
+  if (tools.includes('deepseek')) {
+    text += `
+### DeepSeek R1 (Reasoning Model)
+- Separation of Logic: DeepSeek-R1 uses '<think> ... </think>' blocks for logical deduction. Output final clean code blocks strictly after the thinking block has closed.
+- Strict Surgical Diffs: Instruct the reasoning model to generate only specific line diffs and functional modifications instead of re-generating entire unchanged files, preventing response token overflow.
+`
+  }
   return text
 }
 
@@ -72,6 +94,15 @@ npm install
 npm run dev
 \`\`\``
     }
+    if (fw.includes('svelte')) {
+      return `\`\`\`bash
+# Install dependencies
+npm install
+
+# Run the development server (SvelteKit)
+npm run dev -- --open
+\`\`\``
+    }
     return `\`\`\`bash
 # Install dependencies
 npm install
@@ -81,6 +112,15 @@ npm run dev
 \`\`\``
   }
   if (stack === 'backend') {
+    if (fw.includes('rust')) {
+      return `\`\`\`bash
+# Build and run the project (Cargo)
+cargo run
+
+# Run the test suite
+cargo test
+\`\`\``
+    }
     if (fw.includes('flask') || fw.includes('django') || fw.includes('fastapi')) {
       return `\`\`\`bash
 # Install python dependencies
@@ -174,7 +214,9 @@ out/
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+# Rust compilation output
+/target/
+Cargo.lock.backup
 `
   }
   if (stack === 'data') {

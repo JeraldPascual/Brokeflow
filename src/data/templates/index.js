@@ -3,7 +3,7 @@
 // They are source data — NOT the rules for building Brokeflow itself.
 // The Configurator reads from here and assembles a ZIP for the user.
 
-import { STACK_RULES, SCENARIO_RULES, WINDOW_RULES, TEAM_RULES, DEPLOY_BLOCKS } from './rules'
+import { STACK_RULES, SCENARIO_RULES, WINDOW_RULES, TEAM_RULES, DEPLOY_BLOCKS, FRAMEWORK_RULES, ADDITIONAL_TOOL_RULES } from './rules'
 import { detectStackFromFramework, buildToolsGuide, buildQuickStart, buildGitignore, buildEnvExample, buildViteConfig } from './utils'
 
 // Raw template markdown files imported via Vite raw query suffix
@@ -22,6 +22,19 @@ export function buildFiles({ stack, framework, scenario, window: win, tools, tea
 
   const teamSection  = team   ? '\n' + (TEAM_RULES[team]            || '') : ''
   const deployBlock  = deploy ? (DEPLOY_BLOCKS[deploy] || DEPLOY_BLOCKS.none) : ''
+  
+  // Conditional framework rules detection
+  const fwKey = fw.toLowerCase()
+  let frameworkRules = ''
+  if ((resolvedStack === 'frontend' || resolvedStack === 'fullstack') && fwKey.includes('svelte')) {
+    frameworkRules = '\n' + FRAMEWORK_RULES.sveltekit
+  } else if (resolvedStack === 'backend' && fwKey.includes('rust')) {
+    frameworkRules = '\n' + FRAMEWORK_RULES.rust
+  }
+
+  // Conditional DeepSeek rules detection
+  const deepseekRules = tools.includes('deepseek') ? '\n' + ADDITIONAL_TOOL_RULES.deepseek : ''
+
   const toolsGuide   = buildToolsGuide(tools)
 
   const agentsMd = `# AGENTS.md
@@ -50,7 +63,7 @@ export function buildFiles({ stack, framework, scenario, window: win, tools, tea
   [LAW: most relevant law]
 
   Your instruction here.
-${STACK_RULES[resolvedStack] || STACK_RULES.other}
+${STACK_RULES[resolvedStack] || STACK_RULES.other}${frameworkRules}${deepseekRules}
 ${SCENARIO_RULES[scenario] || ''}
 ${WINDOW_RULES[win] || ''}${teamSection}${toolsGuide}
 `
@@ -90,6 +103,12 @@ Share your experience:
 
   if (tools.includes('cursor'))
     files['.cursorrules'] = agentsMd
+
+  if (tools.includes('aider'))
+    files['.aider.instruction.md'] = agentsMd
+
+  if (tools.includes('windsurf'))
+    files['.windsurfrules'] = agentsMd
 
   if (scenario === 'sdg-hack') {
     files['SDG.md'] = sdgPlaybookMd

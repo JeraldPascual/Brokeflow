@@ -49,6 +49,9 @@ export const STEPS = [
       { id: 'copilot', icon: 'copilot', label: 'GitHub Copilot', desc: 'Student plan (free via GitHub Education)' },
       { id: 'gemini',  icon: 'gemini',  label: 'Gemini Studio',  desc: 'Free API key, 1M token context window' },
       { id: 'cursor',  icon: 'cursor',  label: 'Cursor',         desc: 'IDE with built-in AI chat + autocomplete' },
+      { id: 'aider',   icon: 'aider',   label: 'Aider',          desc: 'Command-line coding assistant' },
+      { id: 'windsurf',icon: 'windsurf',label: 'Windsurf',        desc: 'AI-native IDE by Codeium' },
+      { id: 'deepseek',icon: 'deepseek',label: 'DeepSeek R1',    desc: 'Open-source reasoning model' },
     ],
   },
   {

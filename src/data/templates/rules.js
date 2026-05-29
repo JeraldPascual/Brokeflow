@@ -27,6 +27,10 @@ import deployServer from './markdown/deploys/server.md?raw'
 import deployPages from './markdown/deploys/pages.md?raw'
 import deployNone from './markdown/deploys/none.md?raw'
 
+import sveltekit from './markdown/frameworks/sveltekit.md?raw'
+import rust from './markdown/frameworks/rust.md?raw'
+import deepseek from './markdown/tools/deepseek.md?raw'
+
 export const STACK_RULES = {
   frontend,
   backend,
@@ -61,4 +65,13 @@ export const DEPLOY_BLOCKS = {
   server: deployServer,
   pages: deployPages,
   none: deployNone,
+}
+
+export const FRAMEWORK_RULES = {
+  sveltekit,
+  rust,
+}
+
+export const ADDITIONAL_TOOL_RULES = {
+  deepseek,
 }
