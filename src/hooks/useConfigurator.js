@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react'
 import { STEPS } from '../data/steps'
+import { buildFiles } from '../data/templates'
 
 const INITIAL = {
   step:      0,
@@ -15,6 +16,7 @@ const INITIAL = {
   tools:     [],
   team:      null,   // Phase 2
   deploy:    null,   // Phase 2
+  editedFiles: null, // Edited template files buffer
 }
 
 // Phase 7: lightweight analytics — console in dev, POST to VITE_ANALYTICS_URL in prod
@@ -86,7 +88,15 @@ export function useConfigurator() {
       // Phase 7: config generated — log full answers (no PII)
       const { stack, framework, scenario, window: win, tools, team, deploy } = state
       logEvent('config_generated', { stack, framework, scenario, window: win, tools, team, deploy })
-      setState(s => ({ ...s, done: true }))
+      
+      // Build initial files using the configuration answers
+      const initialFiles = buildFiles({ stack, framework, scenario, window: win, tools, team, deploy })
+      
+      setState(s => ({
+        ...s,
+        done: true,
+        editedFiles: initialFiles,
+      }))
     }
   }
 
@@ -103,6 +113,16 @@ export function useConfigurator() {
     return state[currentStep.id] === id
   }
 
+  function updateFile(path, newContent) {
+    setState(s => ({
+      ...s,
+      editedFiles: {
+        ...s.editedFiles,
+        [path]: newContent,
+      }
+    }))
+  }
+
   return {
     state,
     currentStep,
@@ -113,6 +133,7 @@ export function useConfigurator() {
     back,
     reset,
     isSelected,
+    updateFile,
     stepCount: STEPS.length,
     logEvent,   // Phase 7: exposed so OutputPanel can fire zip_downloaded
   }

@@ -320,3 +320,54 @@ export default defineConfig({
 })
 `
 }
+
+export function parseMarkdownToHtml(md) {
+  if (!md) return ''
+  
+  // Escape HTML entities to prevent rendering bugs and raw script runs
+  let html = md
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+  // Code blocks: ```language ... ```
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    return `<pre class="bg-slate-50 border border-slate-200 rounded-lg p-3 my-3 text-[11px] font-mono overflow-x-auto text-slate-800"><code>${code}</code></pre>`
+  })
+
+  // Inline code: `code`
+  html = html.replace(/`([^`\n]+)`/g, '<code class="bg-slate-100 text-teal-700 px-1.5 py-0.5 rounded font-mono text-[10px]">$1</code>')
+
+  // Bold: **text**
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-black text-slate-900">$1</strong>')
+
+  // Headings: # Title, ## Sub, ### Sub-sub
+  html = html.replace(/^#\s+(.+)$/gm, '<h1 class="text-lg font-black text-slate-900 mt-5 mb-2.5 border-b border-slate-200 pb-1">$1</h1>')
+  html = html.replace(/^##\s+(.+)$/gm, '<h2 class="text-sm font-black text-teal-900 mt-5 mb-2 border-b border-slate-100 pb-0.5">$1</h2>')
+  html = html.replace(/^###\s+(.+)$/gm, '<h3 class="text-xs font-black text-teal-800 mt-4 mb-1.5">$1</h3>')
+
+  // Horizontal rules: ---
+  html = html.replace(/^---$/gm, '<hr class="my-4 border-slate-200" />')
+
+  // Bullet lists: - item or * item
+  html = html.replace(/^[*-]\s+(.+)$/gm, '<li class="ml-4 list-disc pl-0.5 my-1 text-slate-700 text-xs">$1</li>')
+  
+  // Numbered lists: 1. item
+  html = html.replace(/^\d+\.\s+(.+)$/gm, '<li class="ml-4 list-decimal pl-0.5 my-1 text-slate-700 text-xs">$1</li>')
+
+  // Blockquotes: &gt; quote
+  html = html.replace(/^&gt;\s+(.+)$/gm, '<blockquote class="border-l-4 border-teal-500 pl-3 my-2 text-slate-500 italic">$1</blockquote>')
+
+  // Paragraph blocks (split by double newlines)
+  const paragraphs = html.split(/\n\n+/)
+  html = paragraphs.map(p => {
+    const trimmed = p.trim()
+    if (!trimmed) return ''
+    // If it's already an HTML block element, return it as-is
+    if (/^<(h1|h2|h3|pre|hr|li|blockquote)/.test(trimmed)) return trimmed
+    // Otherwise wrap in paragraph
+    return `<p class="my-2.5 leading-relaxed text-slate-600 text-xs">${p}</p>`
+  }).join('\n')
+
+  return html
+}

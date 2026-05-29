@@ -5,6 +5,7 @@
 
 import { useState } from 'react'
 import { buildFiles } from '../data/templates'
+import { parseMarkdownToHtml } from '../data/templates/utils'
 import JSZip from 'jszip'
 
 function buildTree(files) {
@@ -49,7 +50,7 @@ function TreeNode({ name, node, depth, path, onFileClick }) {
   )
 }
 
-export default function OutputPanel({ answers, onReset, onLogEvent }) {
+export default function OutputPanel({ answers, onReset, onLogEvent, onUpdateFile }) {
   const [tab, setTab]             = useState('tree')
   const [activeFile, setFile]     = useState('AGENTS.md')
   const [copied, setCopied]       = useState(false)
@@ -58,7 +59,7 @@ export default function OutputPanel({ answers, onReset, onLogEvent }) {
   const [dlState, setDlState]     = useState('idle')
   const [showWhatsNext, setShowWhatsNext] = useState(false)
 
-  const files = buildFiles(answers)
+  const files = answers.editedFiles || buildFiles(answers)
   const fileNames = Object.keys(files)
 
   // Phase 4c: clicking a tree file switches to browse tab with that file active
@@ -243,12 +244,42 @@ export default function OutputPanel({ answers, onReset, onLogEvent }) {
             </div>
             {/* Content */}
             <div className="flex-1 relative overflow-hidden bg-white">
-              <pre className="p-4 h-full overflow-y-auto text-[11px] text-[var(--text-muted)] leading-relaxed whitespace-pre-wrap break-words font-mono">
-                {files[activeFile]}
-              </pre>
+              {activeFile.endsWith('.md') ? (
+                <div className="flex flex-col md:flex-row h-full divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                  {/* Left Column: Monospace Editor */}
+                  <div className="w-full md:w-1/2 h-1/2 md:h-full relative">
+                    <textarea
+                      value={files[activeFile] || ''}
+                      onChange={e => onUpdateFile?.(activeFile, e.target.value)}
+                      placeholder="Type your markdown rules here..."
+                      className="w-full h-full p-4 pr-16 text-[11px] font-mono text-slate-800 bg-slate-50 focus:outline-none resize-none"
+                    />
+                  </div>
+                  {/* Right Column: HTML Rendered Preview */}
+                  <div className="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto p-5 bg-white prose max-w-none">
+                    <div className="text-[10px] font-black tracking-widest text-[var(--teal)] mb-3 pb-1 border-b border-slate-100">
+                      LIVE PREVIEW
+                    </div>
+                    <div
+                      className="text-xs leading-relaxed text-slate-700"
+                      dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(files[activeFile]) }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                /* Non-markdown Editor (e.g. .gitignore, .env.example, mockDb.js) */
+                <textarea
+                  value={files[activeFile] || ''}
+                  onChange={e => onUpdateFile?.(activeFile, e.target.value)}
+                  placeholder="Edit config file..."
+                  className="w-full h-full p-4 pr-16 text-[11px] font-mono text-slate-800 bg-white focus:outline-none resize-none"
+                />
+              )}
+
+              {/* Copy button absolute overlay */}
               <button
                 onClick={copyFile}
-                className={`absolute top-3 right-3 text-xs font-black px-3 py-1.5 rounded-full border-2 transition-all
+                className={`absolute top-3 right-3 text-[10px] font-black px-3 py-1 rounded-full border-2 transition-all z-10
                   ${copied
                     ? 'bg-emerald-600 border-emerald-600 text-white'
                     : 'bg-white border-[var(--border-med)] text-[var(--teal)] hover:bg-[var(--teal)] hover:text-white hover:border-[var(--teal)]'
