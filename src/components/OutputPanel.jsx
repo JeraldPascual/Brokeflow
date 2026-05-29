@@ -53,11 +53,24 @@ function TreeNode({ name, node, depth, path, onFileClick }) {
 export default function OutputPanel({ answers, onReset, onLogEvent, onUpdateFile }) {
   const [tab, setTab]             = useState('tree')
   const [activeFile, setFile]     = useState('AGENTS.md')
+  const [activeSubTab, setActiveSubTab] = useState('edit') // 'edit' or 'preview'
   const [copied, setCopied]       = useState(false)
   const [agentsCopied, setACopied]= useState(false)
   const [agentsOpen, setAgentsOpen] = useState(false)
   const [dlState, setDlState]     = useState('idle')
   const [showWhatsNext, setShowWhatsNext] = useState(false)
+
+  /*
+   * [ASSUMPTIONS & TRADEOFFS]
+   * - Assumption 1: Toggling between Edit and Preview on mobile saves vertical space (h-[480px]) vs stacking them.
+   * - Assumption 2: A horizontal scrolling list of pill buttons is native and intuitive on mobile viewports.
+   * - Assumption 3: Stacking the tabs and the full-width Download ZIP button prevents tab-bar horizontal wrapping.
+   * - Tradeoff: We utilize CSS media queries (Tailwind md/sm) to keep component layouts unified rather than splitting files.
+   * 
+   * [ASSERTIONS]
+   * - Assertion 1: Non-md screens render edit OR preview, never both. md screens render both side-by-side.
+   * - Assertion 2: ZIP button is w-full on mobile, auto on desktop.
+   */
 
   const files = answers.editedFiles || buildFiles(answers)
   const fileNames = Object.keys(files)
@@ -170,35 +183,36 @@ export default function OutputPanel({ answers, onReset, onLogEvent, onUpdateFile
 
       {/* Output card — Phase 5: .output-card-top replaces inline border-top style */}
       <div className="bg-white border-2 border-[var(--border)] rounded-2xl overflow-hidden shadow-sm output-card-top">
-        {/* Tab bar */}
-        <div className="flex items-center border-b border-[var(--border)] px-2">
-          {['tree', 'browse'].map(t => (
-            <button
-              key={t}
-              id={`tab-${t}`}
-              onClick={() => setTab(t)}
-              className={`px-4 py-3 text-xs font-black tracking-widest border-b-2 transition-all
-                ${tab === t
-                  ? 'border-[var(--teal)] text-[var(--teal-dark)]'
-                  : 'border-transparent text-[var(--text-subtle)] hover:text-[var(--text-muted)]'
-                }`}
-            >
-              {t === 'tree' ? 'FILE TREE' : 'BROWSE FILES'}
-            </button>
-          ))}
+        {/* Tab bar — responsive layout stacked on mobile, inline on sm+ */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border)] px-2 py-2 sm:py-0 gap-2 sm:gap-0 bg-[var(--bg)]/30">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {['tree', 'browse'].map(t => (
+              <button
+                key={t}
+                id={`tab-${t}`}
+                onClick={() => setTab(t)}
+                className={`px-4 py-3 text-xs font-black tracking-widest border-b-2 transition-all
+                  ${tab === t
+                    ? 'border-[var(--teal)] text-[var(--teal-dark)]'
+                    : 'border-transparent text-[var(--text-subtle)] hover:text-[var(--text-muted)]'
+                  }`}
+              >
+                {t === 'tree' ? 'FILE TREE' : 'BROWSE FILES'}
+              </button>
+            ))}
 
-          {/* Phase 4b: file count badge */}
-          <span className="ml-2 bg-[var(--petronas-lt)] text-[var(--teal-dark)] text-[10px] font-black tracking-wider px-2 py-0.5 rounded-full border border-[var(--border-med)]">
-            {fileNames.length} files ready
-          </span>
+            {/* Phase 4b: file count badge */}
+            <span className="ml-2 bg-[var(--petronas-lt)] text-[var(--teal-dark)] text-[10px] font-black tracking-wider px-2 py-0.5 rounded-full border border-[var(--border-med)]">
+              {fileNames.length} files
+            </span>
+          </div>
 
-          {/* Phase 5: w-full on mobile, auto on sm+ */}
-          <div className="ml-auto px-3 py-2">
+          <div className="w-full sm:w-auto px-2 sm:px-3 sm:py-2">
             <button
               id="btn-download-zip"
               onClick={downloadZip}
               disabled={dlState === 'zipping'}
-              className={`text-xs font-black px-4 py-1.5 rounded-full border-none transition-all disabled:opacity-50 w-full sm:w-auto
+              className={`text-xs font-black px-4 py-2.5 sm:py-1.5 rounded-full border-none transition-all disabled:opacity-50 w-full sm:w-auto
                 ${dlState === 'done' ? 'btn-dl-done' : 'btn-dl'}`}
             >
               {dlLabel[dlState]}
@@ -222,71 +236,109 @@ export default function OutputPanel({ answers, onReset, onLogEvent, onUpdateFile
           </div>
         )}
 
-        {/* BROWSE tab — Phase 5: horizontal scroll on mobile, vertical sidebar on sm+ */}
+        {/* BROWSE tab — responsive height: h-[480px] on mobile, h-[560px] on sm+ */}
         {tab === 'browse' && (
-          <div className="flex flex-col sm:flex-row h-[560px]">
-            {/* Sidebar */}
-            <div className="flex sm:flex-col sm:w-52 border-b sm:border-b-0 sm:border-r border-[var(--border)] bg-[var(--bg)] overflow-x-auto sm:overflow-y-auto flex-shrink-0 py-1 sm:py-2">
+          <div className="flex flex-col sm:flex-row h-[480px] sm:h-[560px]">
+            {/* Sidebar — horizontal scrolling pill buttons on mobile, vertical sidebar with border-l-2 on sm+ */}
+            <div className="flex sm:flex-col sm:w-52 border-b sm:border-b-0 sm:border-r border-[var(--border)] bg-[var(--bg)] overflow-x-auto sm:overflow-y-auto flex-shrink-0 p-2 sm:p-0 sm:py-2 gap-2 sm:gap-0 scrollbar-none">
               {fileNames.map(f => (
                 <div
                   key={f}
                   onClick={() => setFile(f)}
-                  className={`flex-shrink-0 px-4 py-2 text-xs cursor-pointer transition-all font-medium whitespace-nowrap sm:whitespace-normal
-                    border-b-2 sm:border-b-0 sm:border-l-2
+                  className={`flex-shrink-0 px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs cursor-pointer transition-all font-bold rounded-full sm:rounded-none
+                    border border-[var(--border)] sm:border-0 sm:border-l-2
                     ${f === activeFile
-                      ? 'border-[var(--teal)] text-[var(--teal-dark)] bg-white font-bold'
-                      : 'border-transparent text-[var(--text-muted)] hover:bg-white hover:text-[var(--text)]'
+                      ? 'bg-[var(--teal)] text-white border-[var(--teal)] sm:border-l-[var(--teal)] sm:bg-white sm:text-[var(--teal-dark)]'
+                      : 'bg-white text-[var(--text-muted)] hover:bg-[var(--bg)] sm:hover:bg-white sm:bg-transparent sm:border-transparent sm:hover:text-[var(--text)]'
                     }`}
                 >
                   {f}
                 </div>
               ))}
             </div>
-            {/* Content */}
-            <div className="flex-1 relative overflow-hidden bg-white">
-              {activeFile.endsWith('.md') ? (
-                <div className="flex flex-col md:flex-row h-full divide-y md:divide-y-0 md:divide-x divide-slate-200">
-                  {/* Left Column: Monospace Editor */}
-                  <div className="w-full md:w-1/2 h-1/2 md:h-full relative">
-                    <textarea
-                      value={files[activeFile] || ''}
-                      onChange={e => onUpdateFile?.(activeFile, e.target.value)}
-                      placeholder="Type your markdown rules here..."
-                      className="w-full h-full p-4 pr-16 text-[11px] font-mono text-slate-800 bg-slate-50 focus:outline-none resize-none"
-                    />
-                  </div>
-                  {/* Right Column: HTML Rendered Preview */}
-                  <div className="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto p-5 bg-white prose max-w-none">
-                    <div className="text-[10px] font-black tracking-widest text-[var(--teal)] mb-3 pb-1 border-b border-slate-100">
-                      LIVE PREVIEW
-                    </div>
-                    <div
-                      className="text-xs leading-relaxed text-slate-700"
-                      dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(files[activeFile]) }}
-                    />
-                  </div>
-                </div>
-              ) : (
-                /* Non-markdown Editor (e.g. .gitignore, .env.example, mockDb.js) */
-                <textarea
-                  value={files[activeFile] || ''}
-                  onChange={e => onUpdateFile?.(activeFile, e.target.value)}
-                  placeholder="Edit config file..."
-                  className="w-full h-full p-4 pr-16 text-[11px] font-mono text-slate-800 bg-white focus:outline-none resize-none"
-                />
-              )}
 
-              {/* Copy button absolute overlay */}
-              <button
-                onClick={copyFile}
-                className={`absolute top-3 right-3 text-[10px] font-black px-3 py-1 rounded-full border-2 transition-all z-10
-                  ${copied
-                    ? 'bg-emerald-600 border-emerald-600 text-white'
-                    : 'bg-white border-[var(--border-med)] text-[var(--teal)] hover:bg-[var(--teal)] hover:text-white hover:border-[var(--teal)]'
-                  }`}
-              >
-                {copied ? '✓ COPIED' : 'COPY'}
-              </button>
+            {/* Content pane with unified header and edit area */}
+            <div className="flex-1 flex flex-col relative overflow-hidden bg-white">
+              {/* Inline File Header Bar */}
+              <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-4 py-2 flex-shrink-0">
+                {activeFile.endsWith('.md') ? (
+                  <>
+                    {/* Mobile: Toggles. Desktop: label. */}
+                    <div className="flex gap-1.5 md:hidden">
+                      {['edit', 'preview'].map(sub => (
+                        <button
+                          key={sub}
+                          onClick={() => {
+                            setActiveSubTab(sub)
+                            onLogEvent?.('sub_tab_changed', { tab: sub, file: activeFile })
+                          }}
+                          className={`text-[10px] font-black tracking-wider px-3 py-1 rounded-full border transition-all
+                            ${activeSubTab === sub
+                              ? 'bg-[var(--teal)] border-[var(--teal)] text-white'
+                              : 'border-slate-300 text-slate-500 hover:bg-slate-100'
+                            }`}
+                        >
+                          {sub.toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="hidden md:block text-[10px] font-black tracking-widest text-[var(--teal)]">
+                      EDITING {activeFile}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-[10px] font-black tracking-widest text-[var(--teal)]">
+                    EDITING {activeFile}
+                  </div>
+                )}
+
+                {/* Copy button inline */}
+                <button
+                  onClick={copyFile}
+                  className={`text-[10px] font-black px-3 py-1.5 rounded-full border-2 transition-all
+                    ${copied
+                      ? 'bg-emerald-600 border-emerald-600 text-white'
+                      : 'bg-white border-[var(--border-med)] text-[var(--teal)] hover:bg-[var(--teal)] hover:text-white hover:border-[var(--teal)]'
+                    }`}
+                >
+                  {copied ? '✓ COPIED' : 'COPY'}
+                </button>
+              </div>
+
+              {/* Editing / Preview area */}
+              <div className="flex-1 overflow-hidden">
+                {activeFile.endsWith('.md') ? (
+                  <div className="flex flex-col md:flex-row h-full divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                    {/* Left Column: Monospace Editor */}
+                    <div className={`w-full md:w-1/2 h-full relative ${activeSubTab === 'edit' ? 'block' : 'hidden md:block'}`}>
+                      <textarea
+                        value={files[activeFile] || ''}
+                        onChange={e => onUpdateFile?.(activeFile, e.target.value)}
+                        placeholder="Type your markdown rules here..."
+                        className="w-full h-full p-4 text-[11px] font-mono text-slate-800 bg-slate-50 focus:outline-none resize-none"
+                      />
+                    </div>
+                    {/* Right Column: HTML Rendered Preview */}
+                    <div className={`w-full md:w-1/2 h-full overflow-y-auto p-5 bg-white prose max-w-none ${activeSubTab === 'preview' ? 'block' : 'hidden md:block'}`}>
+                      <div className="hidden md:block text-[10px] font-black tracking-widest text-[var(--teal)] mb-3 pb-1 border-b border-slate-100">
+                        LIVE PREVIEW
+                      </div>
+                      <div
+                        className="text-xs leading-relaxed text-slate-700"
+                        dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(files[activeFile]) }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  /* Non-markdown Editor */
+                  <textarea
+                    value={files[activeFile] || ''}
+                    onChange={e => onUpdateFile?.(activeFile, e.target.value)}
+                    placeholder="Edit config file..."
+                    className="w-full h-full p-4 text-[11px] font-mono text-slate-800 bg-white focus:outline-none resize-none"
+                  />
+                )}
+              </div>
             </div>
           </div>
         )}
